@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { FlatList, StatusBar, StyleSheet, Text, useColorScheme, View } from 'react-native';
+import { FlatList, StatusBar, StyleSheet, Switch, Text, useColorScheme, View } from 'react-native';
 import {
   SafeAreaProvider,
   SafeAreaView
@@ -19,6 +19,8 @@ function App() {
 function AppContent() {
   const [items, setItems] = useState(() => createPage(0))
 
+  const [disableBatching, setDisableBatching] = useState(false)
+
   const stickyHeaderIndices = useMemo(
     () =>
       items.reduce(
@@ -37,6 +39,13 @@ function AppContent() {
 
   return (
     <SafeAreaView>
+      <View style={styles.control}>
+        <Switch
+          value={disableBatching}
+          onValueChange={setDisableBatching}
+        />
+        <Text>{`maxToRenderPerBatch={${disableBatching ? 1 : 10 }}`}</Text>
+      </View>
       <FlatList
         data={items}
         stickyHeaderIndices={stickyHeaderIndices}
@@ -51,15 +60,17 @@ function AppContent() {
         /**
          * Default: 21
          */
-        windowSize={11}
+        windowSize={21}
         /**
          * Default: 10
+         *
+         * SET THIS TO 1 TO MAKE IT FREAK OUT REALLY EASILY
          */
-        maxToRenderPerBatch={1}
+        maxToRenderPerBatch={disableBatching ? 1 : 10}
         /**
          * Default: 50
          */
-        updateCellsBatchingPeriod={25}
+        updateCellsBatchingPeriod={50}
       />
     </SafeAreaView>
   );
@@ -110,6 +121,13 @@ function createPage(i: number) {
 export default App;
 
 const styles = StyleSheet.create({
+  control: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#f0f0f0',
+    gap: 12,
+  },
   stickyHeader: {
     backgroundColor: '#f0f0f0',
     padding: 16,
